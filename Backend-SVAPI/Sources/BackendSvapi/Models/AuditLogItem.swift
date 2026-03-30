@@ -7,7 +7,7 @@
 import Fluent
 import Vapor
 
-final class AuditLog: Model, Content, @unchecked Sendable {    
+final class AuditLog: Model, Content, @unchecked Sendable {
     static let schema = "audit_logs"
     
     @ID(key: .id)
@@ -22,7 +22,7 @@ final class AuditLog: Model, Content, @unchecked Sendable {
     @Timestamp(key: "created_at", on: .create)
     var createdAt: Date?
     
-    @Boolean(key: "success")
+    @Field(key: "success")
     var success: Bool
     
     init() {}

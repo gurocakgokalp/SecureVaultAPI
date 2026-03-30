@@ -19,6 +19,7 @@ public func configure(_ app: Application) async throws {
 
     app.migrations.add(CreateVaultItem())
     app.migrations.add(CreateAccessToken())
+    app.migrations.add(CreateAuditLog())
     try await app.autoMigrate()
     
     // register routes

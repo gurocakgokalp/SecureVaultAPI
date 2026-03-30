@@ -21,28 +21,32 @@ struct VaultController: RouteCollection {
         let item = VaultItem(encryptedBlob: input.blob)
         try await item.save(on: req.db)
         req.logger.info("Blob stored", metadata: ["id": .string(item.id!.uuidString)])
+        try await AuditLog(action: "store", itemId: item.id!.uuidString, success: true).save(on: req.db)
         return item
     }
     
     func retrieve(req: Request) async throws -> VaultItem {
         guard let item = try await VaultItem.find(req.parameters.get("id"), on: req.db) else {
+            try await AuditLog(action: "retrieve", itemId: req.parameters.get("id") ?? "unknown", success: false).save(on: req.db)
             throw Abort(.notFound)
         }
         
-        try req.verifyAccess(for: item)
-        
+        try await req.verifyAccess(for: item)
+        try await AuditLog(action: "retrieve", itemId: item.id!.uuidString, success: true).save(on: req.db)
         req.logger.info("Blob retrieved", metadata: ["id" : .string(item.id!.uuidString)])
         return item
     }
     
     func delete(req: Request) async throws -> HTTPStatus {
         guard let item = try await VaultItem.find(req.parameters.get("id"), on: req.db) else {
+            try await AuditLog(action: "delete", itemId: req.parameters.get("id") ?? "unknown", success: false).save(on: req.db)
             throw Abort(.notFound)
         }
-        try req.verifyAccess(for: item)
+        try await req.verifyAccess(for: item)
         
         try await item.delete(on: req.db)
         req.logger.info("Blob deleted", metadata: ["id" : .string(item.id!.uuidString)])
+        try await AuditLog(action: "delete", itemId: item.id!.uuidString, success: true).save(on: req.db)
         return .noContent
     }
 }

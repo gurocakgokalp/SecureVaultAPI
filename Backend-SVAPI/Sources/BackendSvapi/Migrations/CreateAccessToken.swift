@@ -19,3 +19,4 @@ struct CreateAccessToken: AsyncMigration {
             .update()
     }
 }
+
