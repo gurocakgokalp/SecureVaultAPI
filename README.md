@@ -25,6 +25,10 @@ The server is designed to be cryptographically blind:
 | GET | `/vault/:id` | Bearer token | Retrieve a blob |
 | DELETE | `/vault/:id` | Bearer token | Delete a blob |
 
+## Audit Logs
+
+<img height="300" alt="image" src="https://github.com/user-attachments/assets/195927db-28d4-472c-a211-64d7cf7ff394" />
+
 ## Usage
 
 **Store:**
