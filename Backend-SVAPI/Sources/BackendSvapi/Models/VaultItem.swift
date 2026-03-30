@@ -18,11 +18,15 @@ final class VaultItem: Model, Content, @unchecked Sendable {
 
     @Timestamp(key: "created_at", on: .create)
     var createdAt: Date?
+    
+    @Field(key: "access_token")
+    var accessToken: String
 
     init() {}
 
     init(id: UUID? = nil, encryptedBlob: String) {
         self.id = id
         self.encryptedBlob = encryptedBlob
+        self.accessToken = UUID().uuidString
     }
 }

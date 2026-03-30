@@ -28,6 +28,9 @@ struct VaultController: RouteCollection {
         guard let item = try await VaultItem.find(req.parameters.get("id"), on: req.db) else {
             throw Abort(.notFound)
         }
+        
+        try req.verifyAccess(for: item)
+        
         req.logger.info("Blob retrieved", metadata: ["id" : .string(item.id!.uuidString)])
         return item
     }
@@ -36,6 +39,8 @@ struct VaultController: RouteCollection {
         guard let item = try await VaultItem.find(req.parameters.get("id"), on: req.db) else {
             throw Abort(.notFound)
         }
+        try req.verifyAccess(for: item)
+        
         try await item.delete(on: req.db)
         req.logger.info("Blob deleted", metadata: ["id" : .string(item.id!.uuidString)])
         return .noContent
