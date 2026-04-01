@@ -6,6 +6,7 @@
 //
 import Fluent
 import Vapor
+import CVaporBcrypt
 
 struct VaultController: RouteCollection {
     func boot(routes: any Vapor.RoutesBuilder) throws {
@@ -17,13 +18,17 @@ struct VaultController: RouteCollection {
     }
     
     
-    func store(req: Request) async throws -> VaultItem {
+    func store(req: Request) async throws -> StoreResponse {
         let input = try req.content.decode(StoreRequest.self)
-        let item = VaultItem(encryptedBlob: input.blob)
+        
+        let accessToken = UUID().uuidString
+        let hashedToken = try Bcrypt.hash(accessToken)
+        
+        let item = VaultItem(encryptedBlob: input.blob, accessToken: hashedToken)
         try await item.save(on: req.db)
         req.logger.info("Blob stored", metadata: ["id": .string(item.id!.uuidString)])
         try await AuditLog(action: "store", itemId: item.id!.uuidString, success: true).save(on: req.db)
-        return item
+        return StoreResponse(id: item.id!.uuidString, blob: item.encryptedBlob, accessToken: accessToken)
     }
     
     func retrieve(req: Request) async throws -> VaultItem {

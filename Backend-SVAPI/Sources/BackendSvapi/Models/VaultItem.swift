@@ -24,9 +24,9 @@ final class VaultItem: Model, Content, @unchecked Sendable {
 
     init() {}
 
-    init(id: UUID? = nil, encryptedBlob: String) {
+    init(id: UUID? = nil, encryptedBlob: String, accessToken: String) {
         self.id = id
         self.encryptedBlob = encryptedBlob
-        self.accessToken = UUID().uuidString
+        self.accessToken = accessToken
     }
 }
