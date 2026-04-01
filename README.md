@@ -28,7 +28,7 @@ The server is designed to be cryptographically blind:
 
 ## Audit Logs
 
-<img height="300" alt="image" src="https://github.com/user-attachments/assets/195927db-28d4-472c-a211-64d7cf7ff394" />
+<img width="600" alt="image" src="https://github.com/user-attachments/assets/4efb65d1-981a-4fb8-b21b-862b917d4310" />
 
 ## Usage
 
@@ -72,6 +72,7 @@ is logged to the database with timestamp and success status.
 - **Zero-knowledge by design** — the server has no decryption capability. 
 Clients are responsible for encrypting before sending.
 - **Self-cleaning memory** — background tasks automatically evict expired IP states from RAM to prevent memory leaks.
+- **Cryptographic Token Hashing** — Access tokens are hashed using Bcrypt before being stored in the database. The server only stores irreversible hashes, ensuring tokens remain secure even in the event of a database breach.
 
 ## Running with Docker
 ```bash
@@ -88,7 +89,6 @@ Backend starts on `http://localhost:8080`. Database migrations run automatically
 
 ## Known Limitations
 
-- Access tokens stored in plaintext in DB — should be hashed in production.
 - No token expiry — tokens are valid indefinitely.
 - Single-user design — no multi-tenancy.
 - Not security audited.
