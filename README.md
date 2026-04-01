@@ -16,6 +16,7 @@ The server is designed to be cryptographically blind:
 - Never inspects content
 - Access controlled via per-item Bearer tokens
 - Every operation logged to audit trail
+- In-memory Swift Actors shield the database from spam and brute-force spikes
 
 ## API
 
@@ -64,10 +65,13 @@ curl -X DELETE http://localhost:8080/vault/<id> \
 
 - **Per-item access tokens** — each stored blob gets a unique Bearer token. 
 No token, no access.
+- **Brute-force protection** — 3 consecutive failed token attempts trigger an automatic 15-minute IP ban via `AsyncMiddleware`. Successful reads reset the failure counter.
+- **Global rate limiting** — an actor-isolated memory cache throttles excessive requests, returning `429 Too Many Requests` without bottlenecking the DB.
 - **Audit logging** — every store, retrieve, delete, and unauthorized attempt 
 is logged to the database with timestamp and success status.
 - **Zero-knowledge by design** — the server has no decryption capability. 
 Clients are responsible for encrypting before sending.
+- **Self-cleaning memory** — background tasks automatically evict expired IP states from RAM to prevent memory leaks.
 
 ## Running with Docker
 ```bash
