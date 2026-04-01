@@ -9,7 +9,8 @@ import Vapor
 
 struct VaultController: RouteCollection {
     func boot(routes: any Vapor.RoutesBuilder) throws {
-        let vault = routes.grouped("vault")
+        let vault = routes.grouped("vault").grouped(BruteForceMiddleware())
+        
         vault.post("store", use: store)
         vault.get(":id", use: retrieve)
         vault.delete(":id", use: delete)
@@ -32,6 +33,9 @@ struct VaultController: RouteCollection {
         }
         
         try await req.verifyAccess(for: item)
+        if let ip = req.remoteAddress?.ipAddress {
+            await BruteForceProtector.shared.resetFailureCount(for: ip)
+        }
         try await AuditLog(action: "retrieve", itemId: item.id!.uuidString, success: true).save(on: req.db)
         req.logger.info("Blob retrieved", metadata: ["id" : .string(item.id!.uuidString)])
         return item
@@ -43,7 +47,9 @@ struct VaultController: RouteCollection {
             throw Abort(.notFound)
         }
         try await req.verifyAccess(for: item)
-        
+        if let ip = req.remoteAddress?.ipAddress {
+            await BruteForceProtector.shared.resetFailureCount(for: ip)
+        }
         try await item.delete(on: req.db)
         req.logger.info("Blob deleted", metadata: ["id" : .string(item.id!.uuidString)])
         try await AuditLog(action: "delete", itemId: item.id!.uuidString, success: true).save(on: req.db)

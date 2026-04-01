@@ -22,6 +22,8 @@ public func configure(_ app: Application) async throws {
     app.migrations.add(CreateAuditLog())
     try await app.autoMigrate()
     
+    app.middleware.use(RateLimiterMiddleware())
+    
     // register routes
     try routes(app)
 }
