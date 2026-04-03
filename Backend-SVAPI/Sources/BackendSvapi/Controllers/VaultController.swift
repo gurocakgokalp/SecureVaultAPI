@@ -24,11 +24,13 @@ struct VaultController: RouteCollection {
         let accessToken = UUID().uuidString
         let hashedToken = try Bcrypt.hash(accessToken)
         
+        try input.validateSize()
+        
         let item = VaultItem(encryptedBlob: input.blob, accessToken: hashedToken)
         try await item.save(on: req.db)
         req.logger.info("Blob stored", metadata: ["id": .string(item.id!.uuidString)])
         try await AuditLog(action: "store", itemId: item.id!.uuidString, success: true).save(on: req.db)
-        return StoreResponse(id: item.id!.uuidString, blob: item.encryptedBlob, accessToken: accessToken)
+        return StoreResponse(id: item.id!.uuidString, accessToken: accessToken)
     }
     
     func retrieve(req: Request) async throws -> VaultItem {

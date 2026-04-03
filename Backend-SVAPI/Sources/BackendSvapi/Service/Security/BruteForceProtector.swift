@@ -33,7 +33,7 @@ actor BruteForceProtector {
     
     private func checkFailureLimit(for ip: String) {
         if var client = clients[ip] {
-            if Date().timeIntervalSince(client.firstRequestTime) <= timeWindowInSeconds && client.failureCount > maxFailure {
+            if Date().timeIntervalSince(client.firstRequestTime) <= timeWindowInSeconds && client.failureCount >= maxFailure {
                 client.banUntil = Date().addingTimeInterval(900)
                 clients[ip] = client
             }

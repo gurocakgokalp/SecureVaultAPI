@@ -9,6 +9,5 @@ import Vapor
 
 struct StoreResponse: Content {
     let id: String
-    let blob: String
     let accessToken: String
 }
